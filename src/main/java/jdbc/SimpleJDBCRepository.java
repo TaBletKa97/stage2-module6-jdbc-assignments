@@ -20,21 +20,20 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = "insert into myusers (id, firstname, lastname, age) values ((?), (?), (?), (?)) returning id";
-    private static final String updateUserSQL = "update myusers set id = (?), firstname = (?), lastname = (?), age = (?) where id = (?) returning id, firstname, lastname, age";
-    private static final String deleteUser = "delete from myusers where id = (?)";
-    private static final String findUserByIdSQL = "select * from myusers where id = (?)";
-    private static final String findUserByNameSQL = "select * from myusers where firstname = (?)";
-    private static final String findAllUserSQL = "select * from myusers";
+    private static final String CREATE_USER_SQL = "insert into myusers (firstname, lastname, age) values ((?), (?), (?)) returning id";
+    private static final String UPDATE_USER_SQL = "update myusers set id = (?), firstname = (?), lastname = (?), age = (?) where id = (?) returning id, firstname, lastname, age";
+    private static final String DELETE_USER = "delete from myusers where id = (?)";
+    private static final String FIND_USER_BY_ID_SQL = "select * from myusers where id = (?)";
+    private static final String FIND_USER_BY_NAME_SQL = "select * from myusers where firstname = (?)";
+    private static final String FIND_ALL_USER_SQL = "select * from myusers";
 
     public Long createUser(User user) {
         long result = -1;
         try {
-            ps = connection.prepareStatement(createUserSQL);
-            ps.setLong(1, user.getId());
-            ps.setString(2, user.getFirstName());
-            ps.setString(3, user.getLastName());
-            ps.setInt(4, user.getAge());
+            ps = connection.prepareStatement(CREATE_USER_SQL);
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getLastName());
+            ps.setInt(3, user.getAge());
             try (ResultSet resultSet = ps.executeQuery()) {
                 if (resultSet.next()) {
                     result = resultSet.getLong(1);
@@ -49,7 +48,7 @@ public class SimpleJDBCRepository {
     public User findUserById(Long userId) {
         User resultUser = null;
         try {
-            ps = connection.prepareStatement(findUserByIdSQL);
+            ps = connection.prepareStatement(FIND_USER_BY_ID_SQL);
             ps.setLong(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -68,7 +67,7 @@ public class SimpleJDBCRepository {
     public User findUserByName(String userName) {
         User resultUser = null;
         try {
-            ps = connection.prepareStatement(findUserByNameSQL);
+            ps = connection.prepareStatement(FIND_USER_BY_NAME_SQL);
             ps.setString(1, userName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -87,7 +86,7 @@ public class SimpleJDBCRepository {
     public List<User> findAllUser() {
         List<User> resultList = new ArrayList<>();
         try {
-            ps = connection.prepareStatement(findAllUserSQL);
+            ps = connection.prepareStatement(FIND_ALL_USER_SQL);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     resultList.add(new User(rs.getLong(1),
@@ -105,7 +104,7 @@ public class SimpleJDBCRepository {
     public User updateUser(User user) {
         User resultUser = null;
         try {
-            ps = connection.prepareStatement(updateUserSQL);
+            ps = connection.prepareStatement(UPDATE_USER_SQL);
             ps.setLong(1, user.getId());
             ps.setLong(5, user.getId());
             ps.setString(2, user.getFirstName());
@@ -127,7 +126,7 @@ public class SimpleJDBCRepository {
 
     public void deleteUser(Long userId) {
         try {
-            ps = connection.prepareStatement(deleteUser);
+            ps = connection.prepareStatement(DELETE_USER);
             ps.setLong(1, userId);
             ps.executeUpdate();
             System.out.println("User with id " + userId + " successfully deleted");
