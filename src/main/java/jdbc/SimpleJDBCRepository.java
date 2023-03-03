@@ -27,29 +27,24 @@ public class SimpleJDBCRepository {
         }
     }
 
-    private static final String CREATE_USER_SQL = "insert into myusers (firstname, lastname, age) values ((?), (?), (?)) returning id";
-    private static final String UPDATE_USER_SQL = "update myusers set id = (?), firstname = (?), lastname = (?), age = (?) where id = (?) returning id, firstname, lastname, age";
+    private static final String CREATE_USER_SQL = "insert into myusers (firstname, lastname, age) values ((?), (?), (?))";
+    private static final String UPDATE_USER_SQL = "update myusers set id = (?), firstname = (?), lastname = (?), age = (?) where id = (?)";
     private static final String DELETE_USER = "delete from myusers where id = (?)";
     private static final String FIND_USER_BY_ID_SQL = "select * from myusers where id = (?)";
     private static final String FIND_USER_BY_NAME_SQL = "select * from myusers where firstname = (?)";
     private static final String FIND_ALL_USER_SQL = "select * from myusers";
 
     public Long createUser(User user) {
-        long result = -1;
         try {
             ps = connection.prepareStatement(CREATE_USER_SQL);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
-            try (ResultSet resultSet = ps.executeQuery()) {
-                if (resultSet.next()) {
-                    result = resultSet.getLong(1);
-                }
-            }
+            ps.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
+        return user.getId();
     }
 
     public User findUserById(Long userId) {
@@ -109,7 +104,6 @@ public class SimpleJDBCRepository {
     }
 
     public User updateUser(User user) {
-        User resultUser = null;
         try {
             ps = connection.prepareStatement(UPDATE_USER_SQL);
             ps.setLong(1, user.getId());
@@ -117,18 +111,11 @@ public class SimpleJDBCRepository {
             ps.setString(2, user.getFirstName());
             ps.setString(3, user.getLastName());
             ps.setInt(4, user.getAge());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    resultUser = new User(rs.getLong(1),
-                            rs.getString(2),
-                            rs.getString(3),
-                            rs.getInt(4));
-                }
-            }
+            ps.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return resultUser;
+        return user;
     }
 
     public void deleteUser(Long userId) {
