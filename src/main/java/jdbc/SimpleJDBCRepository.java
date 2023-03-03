@@ -15,10 +15,17 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SimpleJDBCRepository {
-
     private Connection connection = null;
     private PreparedStatement ps = null;
     private Statement st = null;
+
+    {
+        try {
+            connection = CustomDataSource.getInstance().getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static final String CREATE_USER_SQL = "insert into myusers (firstname, lastname, age) values ((?), (?), (?)) returning id";
     private static final String UPDATE_USER_SQL = "update myusers set id = (?), firstname = (?), lastname = (?), age = (?) where id = (?) returning id, firstname, lastname, age";
