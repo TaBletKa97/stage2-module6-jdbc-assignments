@@ -35,16 +35,23 @@ public class SimpleJDBCRepository {
     private static final String FIND_ALL_USER_SQL = "select * from myusers";
 
     public Long createUser(User user) {
+        Long id = null;
         try {
             ps = connection.prepareStatement(CREATE_USER_SQL);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
-            ps.executeQuery();
+            ps.executeUpdate();
+            try (ResultSet resultSet = ps.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    id = resultSet.getLong(1);
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return user.getId();
+        return id;
     }
 
     public User findUserById(Long userId) {
@@ -111,7 +118,7 @@ public class SimpleJDBCRepository {
             ps.setString(2, user.getFirstName());
             ps.setString(3, user.getLastName());
             ps.setInt(4, user.getAge());
-            ps.executeQuery();
+            ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
