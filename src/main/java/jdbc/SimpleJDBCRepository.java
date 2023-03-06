@@ -1,6 +1,5 @@
 package jdbc;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class SimpleJDBCRepository {
     private Connection connection = null;
@@ -27,8 +25,8 @@ public class SimpleJDBCRepository {
 
     public Long createUser(User user) {
         Long id = null;
-        try (Connection connection = CustomDataSource.getInstance().getConnection()) {
-            ps = connection.prepareStatement(CREATE_USER_SQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(CREATE_USER_SQL)) {
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
@@ -38,7 +36,6 @@ public class SimpleJDBCRepository {
                     id = resultSet.getLong(1);
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -47,8 +44,8 @@ public class SimpleJDBCRepository {
 
     public User findUserById(Long userId) {
         User resultUser = null;
-        try (Connection connection = CustomDataSource.getInstance().getConnection()) {
-            ps = connection.prepareStatement(FIND_USER_BY_ID_SQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(FIND_USER_BY_ID_SQL)) {
             ps.setLong(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -66,8 +63,8 @@ public class SimpleJDBCRepository {
 
     public User findUserByName(String userName) {
         User resultUser = null;
-        try (Connection connection = CustomDataSource.getInstance().getConnection()) {
-            ps = connection.prepareStatement(FIND_USER_BY_NAME_SQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(FIND_USER_BY_NAME_SQL)) {
             ps.setString(1, userName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -85,8 +82,8 @@ public class SimpleJDBCRepository {
 
     public List<User> findAllUser() {
         List<User> resultList = new ArrayList<>();
-        try (Connection connection = CustomDataSource.getInstance().getConnection()) {
-            ps = connection.prepareStatement(FIND_ALL_USER_SQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(FIND_ALL_USER_SQL)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     resultList.add(new User(rs.getLong(1),
@@ -102,8 +99,8 @@ public class SimpleJDBCRepository {
     }
 
     public User updateUser(User user) {
-        try (Connection connection = CustomDataSource.getInstance().getConnection()) {
-            ps = connection.prepareStatement(UPDATE_USER_SQL);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(UPDATE_USER_SQL)) {
             ps.setLong(1, user.getId());
             ps.setLong(5, user.getId());
             ps.setString(2, user.getFirstName());
@@ -117,11 +114,10 @@ public class SimpleJDBCRepository {
     }
 
     public void deleteUser(Long userId) {
-        try (Connection connection = CustomDataSource.getInstance().getConnection()) {
-            ps = connection.prepareStatement(DELETE_USER);
+        try (Connection connection = CustomDataSource.getInstance().getConnection();
+             PreparedStatement ps = connection.prepareStatement(DELETE_USER)) {
             ps.setLong(1, userId);
             ps.executeUpdate();
-            System.out.println("User with id " + userId + " successfully deleted");
         } catch (SQLException e) {
             e.printStackTrace();
         }
