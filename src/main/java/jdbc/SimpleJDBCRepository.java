@@ -26,7 +26,7 @@ public class SimpleJDBCRepository {
     public Long createUser(User user) {
         Long id = null;
         try (Connection connection = CustomDataSource.getInstance().getConnection();
-             PreparedStatement ps = connection.prepareStatement(CREATE_USER_SQL)) {
+             PreparedStatement ps = connection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
