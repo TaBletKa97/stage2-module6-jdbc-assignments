@@ -85,7 +85,7 @@ public class SimpleJDBCRepository {
         try (Connection connection = CustomDataSource.getInstance().getConnection();
              PreparedStatement ps = connection.prepareStatement(FIND_ALL_USER_SQL)) {
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     resultList.add(new User(rs.getLong(1),
                             rs.getString(2),
                             rs.getString(3),
